@@ -4,11 +4,18 @@ const adminEventDescription = document.querySelector("#adminEventDescription");
 const adminEventDate = document.querySelector("#adminEventDate");
 const adminStatus = document.querySelector("#adminStatus");
 const customEventsList = document.querySelector("#customEventsList");
+const authPanel = document.querySelector("#authPanel");
+const authForm = document.querySelector("#authForm");
+const authStatus = document.querySelector("#authStatus");
+const adminPassword = document.querySelector("#adminPassword");
+const adminShell = document.querySelector("#adminShell");
 
-const cookieKeys = {
+const ADMIN_PASSWORD = "worldtimers-admin";
+const storageKeys = {
   customEvents: "world_event_timers_custom_events",
   selectedEvent: "world_event_timers_selected_event",
   theme: "world_event_timers_theme",
+  adminAuth: "world_event_timers_admin_auth",
 };
 
 function setCookie(name, value, days = 365) {
@@ -25,15 +32,36 @@ function getCookie(name) {
   return match ? decodeURIComponent(match.slice(prefix.length)) : "";
 }
 
-function loadCustomEvents() {
-  const saved = getCookie(cookieKeys.customEvents);
+function setStoredValue(key, value) {
+  localStorage.setItem(key, value);
+}
 
-  if (!saved) {
+function getStoredValue(key) {
+  return localStorage.getItem(key) || "";
+}
+
+function loadCustomEvents() {
+  const saved = getStoredValue(storageKeys.customEvents);
+
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch {
+      localStorage.removeItem(storageKeys.customEvents);
+    }
+  }
+
+  const legacyCookie = getCookie(storageKeys.customEvents);
+
+  if (!legacyCookie) {
     return [];
   }
 
   try {
-    return JSON.parse(saved);
+    const parsed = JSON.parse(legacyCookie);
+    setStoredValue(storageKeys.customEvents, JSON.stringify(parsed));
+    setCookie(storageKeys.customEvents, "", -1);
+    return parsed;
   } catch {
     return [];
   }
@@ -41,8 +69,8 @@ function loadCustomEvents() {
 
 let customEvents = loadCustomEvents();
 
-function applyThemeFromCookie() {
-  const savedTheme = getCookie(cookieKeys.theme);
+function applyThemeFromStorage() {
+  const savedTheme = getStoredValue(storageKeys.theme);
   const isLight = savedTheme
     ? savedTheme === "light"
     : window.matchMedia("(prefers-color-scheme: light)").matches;
@@ -53,7 +81,12 @@ function applyThemeFromCookie() {
 }
 
 function saveCustomEvents() {
-  setCookie(cookieKeys.customEvents, JSON.stringify(customEvents));
+  setStoredValue(storageKeys.customEvents, JSON.stringify(customEvents));
+}
+
+function unlockAdmin() {
+  authPanel.hidden = true;
+  adminShell.hidden = false;
 }
 
 function renderCustomEvents() {
@@ -88,7 +121,7 @@ function renderCustomEvents() {
     useButton.className = "inline-flex min-h-10 items-center rounded-full border border-line px-3 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline";
     useButton.textContent = "Open";
     useButton.addEventListener("click", () => {
-      setCookie(cookieKeys.selectedEvent, event.id);
+      setStoredValue(storageKeys.selectedEvent, event.id);
       window.location.href = "../index.html";
     });
 
@@ -121,6 +154,21 @@ function createLocalizedText(text) {
   };
 }
 
+authForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (adminPassword.value !== ADMIN_PASSWORD) {
+    authStatus.textContent = "Incorrect password.";
+    adminPassword.select();
+    return;
+  }
+
+  sessionStorage.setItem(storageKeys.adminAuth, "true");
+  authStatus.textContent = "";
+  adminPassword.value = "";
+  unlockAdmin();
+});
+
 adminForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -142,6 +190,7 @@ adminForm.addEventListener("submit", (event) => {
 
   const customEvent = {
     id: `custom-${Date.now()}`,
+    category: createLocalizedText("General"),
     title: createLocalizedText(title),
     description: createLocalizedText(description),
     startDate: isoDate,
@@ -149,11 +198,15 @@ adminForm.addEventListener("submit", (event) => {
 
   customEvents.unshift(customEvent);
   saveCustomEvents();
-  setCookie(cookieKeys.selectedEvent, customEvent.id);
+  setStoredValue(storageKeys.selectedEvent, customEvent.id);
   adminForm.reset();
   adminStatus.textContent = "Event saved.";
   renderCustomEvents();
 });
 
 renderCustomEvents();
-applyThemeFromCookie();
+applyThemeFromStorage();
+
+if (sessionStorage.getItem(storageKeys.adminAuth) === "true") {
+  unlockAdmin();
+}

@@ -46,11 +46,12 @@ select option {
 
 .flip-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, clamp(8rem, 18vw, 11rem)), 1fr));
+  gap: clamp(0.75rem, 1.8vw, 1.25rem);
   width: 100%;
   direction: ltr;
   unicode-bidi: isolate;
+  align-items: start;
 }
 
 .flip-unit {
@@ -58,6 +59,7 @@ select option {
   min-width: 0;
   overflow: hidden;
   direction: ltr;
+  align-self: stretch;
 }
 
 .flip-tick {
@@ -65,21 +67,30 @@ select option {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: clamp(2.4rem, 5vw, 5.5rem);
+  min-width: 0;
+  font-size: clamp(2.35rem, 5.8vw, 5.6rem);
+  line-height: 1;
   overflow: hidden;
   font-family: "IBM Plex Mono", monospace;
   direction: ltr;
 }
 
 .tick [data-repeat="true"] {
-  display: inline-flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-wrap: nowrap;
   white-space: nowrap;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
+  overflow: hidden;
 }
 
 .tick-flip {
-  min-width: 1.1em;
+  min-width: 1.12em;
+  width: 1.12em;
+  aspect-ratio: 1 / 1.16;
   flex: 0 0 auto;
 }
 
@@ -89,6 +100,13 @@ select option {
 .tick-flip-panel-text-wrapper {
   font-family: "IBM Plex Mono", monospace;
   font-variant-numeric: tabular-nums lining-nums;
+}
+
+.tick-flip-spacer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .event-card__description,
@@ -103,8 +121,7 @@ select option {
 
 @media (max-width: 640px) {
   .flip-grid {
-    gap: 0.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, clamp(6.5rem, 30vw, 8.5rem)), 1fr));
   }
 
   .flip-unit {
@@ -112,13 +129,13 @@ select option {
   }
 
   .flip-tick {
-    font-size: clamp(2rem, 9vw, 3.3rem);
+    font-size: clamp(1.9rem, 9vw, 3.5rem);
   }
 }
 
 @media (min-width: 1200px) {
   .flip-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(min(100%, 10rem), 1fr));
   }
 }
 

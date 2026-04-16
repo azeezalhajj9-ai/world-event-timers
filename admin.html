@@ -44,6 +44,31 @@
 </head>
 <body class="bg-paper text-ink font-sans dark:bg-nightpaper dark:text-nightink">
   <div class="relative mx-auto min-h-screen w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6 lg:px-8">
+    <section
+      id="authPanel"
+      class="mx-auto mt-12 max-w-xl rounded-[24px] border border-line bg-white/70 p-5 shadow-card backdrop-blur dark:border-nightline dark:bg-white/5"
+    >
+      <div class="mb-4 flex flex-col gap-1">
+        <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]">Restricted</p>
+        <h1 class="font-serif text-3xl font-semibold tracking-[-0.03em]">Admin access</h1>
+        <p class="text-sm text-muted dark:text-nightmuted">Enter the admin password to manage persistent custom events.</p>
+      </div>
+
+      <form id="authForm" class="grid gap-4">
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Password</span>
+          <input id="adminPassword" type="password" required class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5">
+        </label>
+        <div class="flex flex-wrap items-center gap-3">
+          <button class="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-nightpaper" type="submit">
+            Unlock admin
+          </button>
+          <p id="authStatus" class="text-sm text-muted dark:text-nightmuted" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <div id="adminShell" hidden>
     <header class="sticky top-3 z-30 rounded-2xl border border-line/70 bg-paper/90 shadow-card backdrop-blur dark:border-nightline/70 dark:bg-nightpaper/90">
       <nav class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
         <div>
@@ -98,6 +123,7 @@
         <div id="customEventsList" class="grid gap-3"></div>
       </section>
     </main>
+    </div>
   </div>
 
   <script src="admin.js"></script>

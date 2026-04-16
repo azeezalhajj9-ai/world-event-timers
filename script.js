@@ -364,7 +364,7 @@ const flipHoursLabel = document.querySelector("#flipHoursLabel");
 const flipMinutesLabel = document.querySelector("#flipMinutesLabel");
 const flipSecondsLabel = document.querySelector("#flipSecondsLabel");
 
-const cookieKeys = {
+const storageKeys = {
   theme: "world_event_timers_theme",
   language: "world_event_timers_language",
   selectedEvent: "world_event_timers_selected_event",
@@ -386,6 +386,14 @@ function getAllEvents() {
   return [...events, ...customEvents];
 }
 
+function setStoredValue(name, value) {
+  localStorage.setItem(name, value);
+}
+
+function getStoredValue(name) {
+  return localStorage.getItem(name) || "";
+}
+
 function setCookie(name, value, days = 365) {
   const expires = new Date(Date.now() + days * 86400000).toUTCString();
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
@@ -398,6 +406,31 @@ function getCookie(name) {
     .find((row) => row.startsWith(prefix));
 
   return match ? decodeURIComponent(match.slice(prefix.length)) : "";
+}
+
+function getPreference(name) {
+  return getStoredValue(name) || getCookie(name);
+}
+
+function setPreference(name, value) {
+  setStoredValue(name, value);
+  setCookie(name, value);
+}
+
+function loadPersistedCustomEvents() {
+  const savedCustomEvents = getStoredValue(storageKeys.customEvents) || getCookie(storageKeys.customEvents);
+
+  if (!savedCustomEvents) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(savedCustomEvents);
+    setStoredValue(storageKeys.customEvents, JSON.stringify(parsed));
+    return parsed;
+  } catch {
+    return [];
+  }
 }
 
 function parseEventDate(isoString) {
@@ -674,13 +707,13 @@ function updateViewMode() {
   mainNavbar.hidden = isDetailView;
   listPanel.hidden = isDetailView;
   detailPanel.hidden = !isDetailView;
-  setCookie(cookieKeys.detailView, String(isDetailView));
+  setPreference(storageKeys.detailView, String(isDetailView));
 }
 
 function selectEvent(eventId, shouldScroll = true) {
   selectedEventId = eventId;
   isDetailView = true;
-  setCookie(cookieKeys.selectedEvent, selectedEventId);
+  setPreference(storageKeys.selectedEvent, selectedEventId);
   updateViewMode();
   syncActiveCardState();
   renderFocusPanel();
@@ -690,7 +723,7 @@ function selectEvent(eventId, shouldScroll = true) {
 function closeDetailView() {
   isDetailView = false;
   updateViewMode();
-  setCookie(cookieKeys.selectedEvent, selectedEventId);
+  setPreference(storageKeys.selectedEvent, selectedEventId);
 }
 
 function buildCard(event) {
@@ -777,7 +810,7 @@ function applyTheme(theme) {
 }
 
 function initializeTheme() {
-  const savedTheme = getCookie(cookieKeys.theme);
+  const savedTheme = getPreference(storageKeys.theme);
   const preferredTheme =
     savedTheme ||
     (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
@@ -786,7 +819,7 @@ function initializeTheme() {
 }
 
 function initializeLanguage() {
-  const savedLanguage = getCookie(cookieKeys.language);
+  const savedLanguage = getPreference(storageKeys.language);
 
   if (savedLanguage && languages.some((language) => language.code === savedLanguage)) {
     currentLanguage = savedLanguage;
@@ -797,11 +830,10 @@ function initializeLanguage() {
 }
 
 function initializePreferences() {
-  const savedSort = getCookie(cookieKeys.sort);
-  const savedSearch = getCookie(cookieKeys.search);
-  const savedEventId = getCookie(cookieKeys.selectedEvent);
-  const savedDetailView = getCookie(cookieKeys.detailView);
-  const savedCustomEvents = getCookie(cookieKeys.customEvents);
+  const savedSort = getPreference(storageKeys.sort);
+  const savedSearch = getPreference(storageKeys.search);
+  const savedEventId = getPreference(storageKeys.selectedEvent);
+  const savedDetailView = getPreference(storageKeys.detailView);
 
   if (savedSort && sortValues.includes(savedSort)) {
     sortSelect.value = savedSort;
@@ -815,13 +847,7 @@ function initializePreferences() {
     selectedEventId = savedEventId;
   }
 
-  if (savedCustomEvents) {
-    try {
-      customEvents = JSON.parse(savedCustomEvents);
-    } catch {
-      customEvents = [];
-    }
-  }
+  customEvents = loadPersistedCustomEvents();
 
   if (savedEventId && getAllEvents().some((event) => event.id === savedEventId)) {
     selectedEventId = savedEventId;
@@ -831,12 +857,12 @@ function initializePreferences() {
 }
 
 searchInput.addEventListener("input", () => {
-  setCookie(cookieKeys.search, searchInput.value);
+  setPreference(storageKeys.search, searchInput.value);
   renderEvents();
 });
 
 sortSelect.addEventListener("change", () => {
-  setCookie(cookieKeys.sort, sortSelect.value);
+  setPreference(storageKeys.sort, sortSelect.value);
   renderEvents();
 });
 
@@ -844,7 +870,7 @@ backButton.addEventListener("click", closeDetailView);
 
 languageSelect.addEventListener("change", () => {
   currentLanguage = languageSelect.value;
-  setCookie(cookieKeys.language, currentLanguage);
+  setPreference(storageKeys.language, currentLanguage);
   applyTranslations();
   applyTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   renderEvents();
@@ -853,7 +879,7 @@ languageSelect.addEventListener("change", () => {
 
 themeToggle.addEventListener("click", () => {
   const nextTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
-  setCookie(cookieKeys.theme, nextTheme);
+  setPreference(storageKeys.theme, nextTheme);
   applyTheme(nextTheme);
 });
 
