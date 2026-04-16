@@ -17,6 +17,7 @@ const storageKeys = {
   theme: "world_event_timers_theme",
 };
 const firestoreCollection = "customEvents";
+const adminUsersCollection = "adminUsers";
 const HOME_PAGE = "../index.html";
 
 function setCookie(name, value, days = 365) {
@@ -71,6 +72,7 @@ function loadCustomEvents() {
 let customEvents = loadCustomEvents();
 let unsubscribeCustomEvents = null;
 const firebaseAvailable = Boolean(window.firebaseReady && window.firebaseClients);
+let passwordResetPromptedThisSession = false;
 
 function applyThemeFromStorage() {
   const savedTheme = getStoredValue(storageKeys.theme);
@@ -95,6 +97,44 @@ function unlockAdmin() {
 function lockAdmin() {
   authPanel.hidden = false;
   adminShell.hidden = true;
+}
+
+function normalizeEmail(value) {
+  return value.trim().toLowerCase();
+}
+
+function getAdminUserDocId(email) {
+  return normalizeEmail(email).replaceAll(".", ",");
+}
+
+async function ensureAdminUserRecord(user, markMustChangePassword = false) {
+  const email = normalizeEmail(user.email || "");
+  const docId = getAdminUserDocId(email);
+  const userDocRef = window.firebaseClients.db.collection(adminUsersCollection).doc(docId);
+  const userDoc = await userDocRef.get();
+
+  if (!userDoc.exists) {
+    await userDocRef.set({
+      uid: user.uid,
+      email,
+      mustChangePassword: markMustChangePassword,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    return { exists: false, mustChangePassword: markMustChangePassword };
+  }
+
+  await userDocRef.update({
+    uid: user.uid,
+    lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+
+  const data = userDoc.data() || {};
+  return { exists: true, mustChangePassword: Boolean(data.mustChangePassword) };
+}
+
+async function sendPasswordResetPrompt(email) {
+  await window.firebaseClients.auth.sendPasswordResetEmail(normalizeEmail(email));
 }
 
 function renderCustomEvents() {
@@ -181,15 +221,49 @@ authForm.addEventListener("submit", async (event) => {
   }
 
   authStatus.textContent = "Signing in...";
+  const email = adminEmail.value.trim();
+  const password = adminPassword.value;
 
   try {
-    await window.firebaseClients.auth.signInWithEmailAndPassword(
-      adminEmail.value.trim(),
-      adminPassword.value
-    );
+    await window.firebaseClients.auth.signInWithEmailAndPassword(email, password);
     authStatus.textContent = "";
     authForm.reset();
-  } catch {
+  } catch (error) {
+    const code = error?.code || "";
+
+    if (code === "auth/user-not-found") {
+      authStatus.textContent = "No admin user found. Creating one...";
+
+      try {
+        const credential = await window.firebaseClients.auth.createUserWithEmailAndPassword(
+          email,
+          password
+        );
+        await ensureAdminUserRecord(credential.user, true);
+        await sendPasswordResetPrompt(email);
+        passwordResetPromptedThisSession = true;
+        authStatus.textContent =
+          "Admin user created. Password reset email sent - please change your password.";
+        authForm.reset();
+        return;
+      } catch (createError) {
+        if (createError?.code === "auth/email-already-in-use") {
+          authStatus.textContent = "Account already exists. Try signing in again.";
+          adminPassword.select();
+          return;
+        }
+
+        if (createError?.code === "auth/weak-password") {
+          authStatus.textContent = "Password must be at least 6 characters.";
+          adminPassword.select();
+          return;
+        }
+
+        authStatus.textContent = "Could not create admin account.";
+        return;
+      }
+    }
+
     authStatus.textContent = "Sign-in failed. Check your email/password.";
     adminPassword.select();
   }
@@ -250,7 +324,7 @@ renderCustomEvents();
 applyThemeFromStorage();
 
 if (firebaseAvailable) {
-  window.firebaseClients.auth.onAuthStateChanged((user) => {
+  window.firebaseClients.auth.onAuthStateChanged(async (user) => {
     if (!user) {
       if (unsubscribeCustomEvents) {
         unsubscribeCustomEvents();
@@ -260,6 +334,22 @@ if (firebaseAvailable) {
       renderCustomEvents();
       lockAdmin();
       return;
+    }
+
+    try {
+      const adminRecord = await ensureAdminUserRecord(user, false);
+
+      if (adminRecord.mustChangePassword && !passwordResetPromptedThisSession) {
+        await sendPasswordResetPrompt(user.email || "");
+        passwordResetPromptedThisSession = true;
+      }
+
+      if (adminRecord.mustChangePassword) {
+        adminStatus.textContent =
+          "For security, check your email and change your password using the reset link.";
+      }
+    } catch {
+      adminStatus.textContent = "Could not verify admin user record in Firebase.";
     }
 
     unlockAdmin();
