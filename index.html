@@ -8,99 +8,277 @@
     name="description"
     content="Track major world events with live timers showing how long ago each milestone began."
   >
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap"
     rel="stylesheet"
   >
+  <link href="vendor/flip/flip.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            paper: "#f7f1e7",
+            ink: "#241c14",
+            muted: "#73614d",
+            sand: "#efe3d1",
+            line: "#d8c4aa",
+            amberink: "#8b6031",
+            nightpaper: "#17120d",
+            nightink: "#f4eadc",
+            nightmuted: "#bca891",
+            nightline: "#5a4835"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            serif: ["Newsreader", "serif"]
+          },
+          boxShadow: {
+            card: "0 18px 42px rgba(73, 53, 31, 0.08)"
+          }
+        }
+      }
+    };
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="page-shell">
-    <header class="hero">
-      <div class="hero__copy">
-        <p class="eyebrow">Historical timelines in motion</p>
-        <h1>World Event Timers</h1>
-        <p class="hero__text">
-          Live counters for defining global events, measured from the moment they began to now.
-        </p>
-      </div>
+<body class="bg-paper text-ink font-sans selection:bg-amber-200/70 dark:bg-nightpaper dark:text-nightink">
+  <div
+    class="pointer-events-none fixed inset-0 opacity-60"
+    aria-hidden="true"
+    style="background:
+      linear-gradient(180deg, rgba(255,255,255,0.10), transparent 24%),
+      radial-gradient(circle at top right, rgba(207,185,144,0.22), transparent 28%),
+      linear-gradient(90deg, rgba(86,64,38,0.03) 1px, transparent 1px),
+      linear-gradient(rgba(86,64,38,0.03) 1px, transparent 1px);
+      background-size: auto, auto, 28px 28px, 28px 28px;">
+  </div>
 
-      <div class="hero__actions">
-        <label class="search-field" for="searchInput">
-          <span class="search-field__label">Search events</span>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search by title, description, or date"
-            autocomplete="off"
+  <div class="relative mx-auto min-h-screen w-full max-w-none p-4 sm:p-6 lg:p-8">
+    <header
+      id="mainNavbar"
+      class="sticky top-3 z-30 overflow-hidden rounded-2xl border border-line/70 bg-paper/90 shadow-card backdrop-blur dark:border-nightline/70 dark:bg-nightpaper/90"
+    >
+      <nav class="flex flex-col gap-3 px-3 py-3 sm:px-4 lg:px-5">
+        <div class="flex min-h-[56px] flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div class="flex min-w-0 items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line/80 bg-white/70 text-sm font-semibold text-amberink dark:border-nightline/70 dark:bg-white/5 dark:text-[#d7b183]">
+              WT
+            </div>
+            <div class="min-w-0">
+              <p
+                class="text-[10px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"
+                data-i18n="eyebrow"
+              >
+                Historical timelines in motion
+              </p>
+              <h1
+                class="truncate font-serif text-xl font-semibold leading-none tracking-[-0.03em] sm:text-2xl"
+                data-i18n="headline"
+              >
+                World Event Timers
+              </h1>
+            </div>
+          </div>
+          <div class="hidden shrink-0 rounded-full border border-line/80 bg-white/70 px-3 py-1 text-xs font-medium text-muted dark:border-nightline/70 dark:bg-white/5 dark:text-nightmuted lg:block">
+            Historical event tracker
+          </div>
+        </div>
+
+        <div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,160px)_auto] xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,180px)_auto]">
+          <label class="flex flex-col gap-1.5">
+            <span
+              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              data-i18n="searchLabel"
+            >
+              Search events
+            </span>
+            <input
+              id="searchInput"
+              type="search"
+              autocomplete="off"
+              class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm text-ink outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5 dark:text-nightink"
+            >
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span
+              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              data-i18n="sortLabel"
+            >
+              Sort by
+            </span>
+            <select
+              id="sortSelect"
+              aria-label="Sort events"
+              class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm text-ink outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5 dark:text-nightink"
+            ></select>
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span
+              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              data-i18n="languageLabel"
+            >
+              Language
+            </span>
+            <select
+              id="languageSelect"
+              aria-label="Language"
+              class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm text-ink outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5 dark:text-nightink"
+            ></select>
+          </label>
+
+          <div class="flex items-end">
+            <button
+              id="themeToggle"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white/80 text-ink transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5 dark:text-nightink"
+              type="button"
+              aria-pressed="false"
+              aria-label="Theme"
+              title="Theme"
+            ></button>
+          </div>
+        </div>
+        <div class="flex items-center justify-end">
+          <a
+            href="admin/"
+            class="inline-flex min-h-9 items-center rounded-full border border-line bg-white/80 px-3 py-2 text-xs font-medium text-ink transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5 dark:text-nightink"
           >
-        </label>
-
-        <label class="sort-field" for="sortSelect">
-          <span class="search-field__label">Sort by</span>
-          <select id="sortSelect" aria-label="Sort events">
-            <option value="elapsed-desc">Longest running</option>
-            <option value="elapsed-asc">Most recent</option>
-            <option value="date-asc">Oldest start date</option>
-            <option value="date-desc">Newest start date</option>
-            <option value="title-asc">Title A-Z</option>
-            <option value="title-desc">Title Z-A</option>
-          </select>
-        </label>
-
-        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
-          Toggle dark mode
-        </button>
-      </div>
+            Admin
+          </a>
+        </div>
+      </nav>
     </header>
 
-    <main>
-      <section class="summary-panel" aria-label="Overview">
-        <div class="summary-card">
-          <span class="summary-card__label">Visible events</span>
-          <strong id="eventCount">0</strong>
-        </div>
-        <div class="summary-card">
-          <span class="summary-card__label">Oldest event</span>
-          <strong id="oldestEvent">-</strong>
-        </div>
-        <div class="summary-card">
-          <span class="summary-card__label">Latest event</span>
-          <strong id="newestEvent">-</strong>
+    <main class="mt-6">
+      <section
+        id="detailPanel"
+        class="detail-panel min-h-[calc(100vh-2rem)] w-full rounded-[28px] border border-line bg-white/70 p-5 shadow-card backdrop-blur dark:border-nightline dark:bg-white/5 sm:min-h-[calc(100vh-3rem)] sm:p-6"
+        aria-live="polite"
+        tabindex="-1"
+        hidden
+      >
+        <button
+          id="backButton"
+          class="back-button inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-nightpaper dark:text-nightink"
+          type="button"
+        ></button>
+
+        <div class="space-y-6 py-8 sm:py-12">
+          <div class="flex justify-center">
+            <span
+              id="focusCategory"
+              class="rounded-full border border-line bg-paper px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"
+            >
+              -
+            </span>
+          </div>
+          <h2
+            id="focusTitle"
+            class="focus-panel__title text-center font-serif text-4xl font-semibold leading-none tracking-[-0.04em] sm:text-5xl lg:text-6xl"
+            >
+            -
+          </h2>
+
+          <div class="focus-panel__timer-block rounded-[22px] border border-line bg-paper/80 p-5 dark:border-nightline dark:bg-white/5">
+            <span
+              class="focus-panel__timer-label text-[11px] font-semibold uppercase tracking-[0.22em] text-amberink dark:text-[#d7b183]"
+              data-i18n="elapsedLabel"
+            >
+              Elapsed time
+            </span>
+            <div class="flip-grid mt-4">
+              <div class="flip-unit flex flex-col items-center gap-2">
+                <div id="flipYears" class="tick flip-tick" aria-hidden="true">
+                  <div data-repeat="true"><span data-view="flip"></span></div>
+                </div>
+                <span id="flipYearsLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">Y</span>
+              </div>
+              <div class="flip-unit flex flex-col items-center gap-2">
+                <div id="flipDays" class="tick flip-tick" aria-hidden="true">
+                  <div data-repeat="true"><span data-view="flip"></span></div>
+                </div>
+                <span id="flipDaysLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">D</span>
+              </div>
+              <div class="flip-unit flex flex-col items-center gap-2">
+                <div id="flipHours" class="tick flip-tick" aria-hidden="true">
+                  <div data-repeat="true"><span data-view="flip"></span></div>
+                </div>
+                <span id="flipHoursLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">H</span>
+              </div>
+              <div class="flip-unit flex flex-col items-center gap-2">
+                <div id="flipMinutes" class="tick flip-tick" aria-hidden="true">
+                  <div data-repeat="true"><span data-view="flip"></span></div>
+                </div>
+                <span id="flipMinutesLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">M</span>
+              </div>
+              <div class="flip-unit flex flex-col items-center gap-2">
+                <div id="flipSeconds" class="tick flip-tick" aria-hidden="true">
+                  <div data-repeat="true"><span data-view="flip"></span></div>
+                </div>
+                <span id="flipSecondsLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">S</span>
+              </div>
+            </div>
+            <strong
+              id="focusTimer"
+              class="sr-only"
+            >
+              0y 0d 0h 0m 0s
+            </strong>
+          </div>
         </div>
       </section>
 
-      <section>
-        <div id="eventsGrid" class="events-grid" aria-live="polite"></div>
-        <p id="emptyState" class="empty-state" hidden>
-          No events match the current search.
-        </p>
+      <section id="listPanel" class="list-panel">
+        <div class="layout">
+          <section class="events-section">
+            <div id="eventsGrid" class="events-grid grid gap-3" aria-live="polite"></div>
+            <p
+              id="emptyState"
+              class="empty-state mt-10 text-center text-sm text-muted dark:text-nightmuted"
+              hidden
+              data-i18n="emptyState"
+            >
+              No events match the current search.
+            </p>
+          </section>
+        </div>
       </section>
     </main>
   </div>
 
   <template id="eventCardTemplate">
-    <article class="event-card">
-      <div class="event-card__header">
-        <p class="event-card__date"></p>
-        <h2 class="event-card__title"></h2>
+    <article
+      class="event-card cursor-pointer rounded-[22px] border border-line bg-white/75 p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5"
+      tabindex="0"
+      role="button"
+    >
+      <div class="event-card__header grid gap-2">
+        <span class="event-card__category inline-flex w-fit rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"></span>
+        <p class="event-card__date text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"></p>
+        <h3 class="event-card__title font-serif text-[1.7rem] font-semibold leading-[1.05] tracking-[-0.03em]"></h3>
       </div>
-      <p class="event-card__description"></p>
-      <dl class="event-card__details">
+      <p class="event-card__description text-sm leading-7 text-muted dark:text-nightmuted"></p>
+      <dl class="event-card__details mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-[1fr_auto] sm:items-end dark:border-nightline">
         <div>
-          <dt>Start date</dt>
-          <dd class="event-card__start"></dd>
+          <dt class="event-card__start-label text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Start date</dt>
+          <dd class="event-card__start mt-2 text-sm text-muted dark:text-nightmuted"></dd>
         </div>
         <div>
-          <dt>Elapsed time</dt>
-          <dd class="event-card__timer"></dd>
+          <dt class="event-card__timer-label text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Elapsed time</dt>
+          <dd class="event-card__timer mt-2 font-serif text-2xl font-semibold leading-none tracking-[-0.03em] sm:text-right"></dd>
         </div>
       </dl>
     </article>
   </template>
 
+  <script src="vendor/flip/flip.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

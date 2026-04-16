@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Event Timers Admin</title>
+  <meta name="description" content="Add and manage custom world events.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap"
+    rel="stylesheet"
+  >
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            paper: "#f7f1e7",
+            ink: "#241c14",
+            muted: "#73614d",
+            line: "#d8c4aa",
+            amberink: "#8b6031",
+            nightpaper: "#17120d",
+            nightink: "#f4eadc",
+            nightmuted: "#bca891",
+            nightline: "#5a4835"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            serif: ["Newsreader", "serif"]
+          },
+          boxShadow: {
+            card: "0 18px 42px rgba(73, 53, 31, 0.08)"
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body class="bg-paper text-ink font-sans dark:bg-nightpaper dark:text-nightink">
+  <div class="relative mx-auto min-h-screen w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6 lg:px-8">
+    <header class="sticky top-3 z-30 rounded-2xl border border-line/70 bg-paper/90 shadow-card backdrop-blur dark:border-nightline/70 dark:bg-nightpaper/90">
+      <nav class="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
+        <div>
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]">Admin</p>
+          <h1 class="font-serif text-2xl font-semibold tracking-[-0.03em]">World Event Timers</h1>
+        </div>
+        <a
+          href="../index.html"
+          class="inline-flex min-h-10 items-center rounded-full border border-line bg-white/80 px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5"
+        >
+          Back to site
+        </a>
+      </nav>
+    </header>
+
+    <main class="mt-6 space-y-6">
+      <section class="rounded-[24px] border border-line bg-white/70 p-5 shadow-card backdrop-blur dark:border-nightline dark:bg-white/5">
+        <div class="mb-4 flex flex-col gap-1">
+          <h2 class="font-serif text-3xl font-semibold tracking-[-0.03em]">Add event</h2>
+          <p class="text-sm text-muted dark:text-nightmuted">Create a custom event that will appear on the main page.</p>
+        </div>
+
+        <form id="adminForm" class="grid gap-4 lg:grid-cols-2">
+          <label class="flex flex-col gap-1.5">
+            <span class="text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Event title</span>
+            <input id="adminEventTitle" type="text" required class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5">
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Start date and time</span>
+            <input id="adminEventDate" type="datetime-local" required class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5">
+          </label>
+
+          <label class="flex flex-col gap-1.5 lg:col-span-2">
+            <span class="text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Description</span>
+            <textarea id="adminEventDescription" rows="4" class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5"></textarea>
+          </label>
+
+          <div class="flex flex-wrap items-center gap-3 lg:col-span-2">
+            <button class="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-nightpaper" type="submit">
+              Add event
+            </button>
+            <p id="adminStatus" class="text-sm text-muted dark:text-nightmuted" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
+      <section class="rounded-[24px] border border-line bg-white/70 p-5 shadow-card backdrop-blur dark:border-nightline dark:bg-white/5">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="font-serif text-2xl font-semibold tracking-[-0.03em]">Custom events</h2>
+        </div>
+        <div id="customEventsList" class="grid gap-3"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
