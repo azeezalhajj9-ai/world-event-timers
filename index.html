@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Event Timers</title>
+  <meta
+    name="description"
+    content="Track major world events with live timers showing how long ago each milestone began."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">Historical timelines in motion</p>
+        <h1>World Event Timers</h1>
+        <p class="hero__text">
+          Live counters for defining global events, measured from the moment they began to now.
+        </p>
+      </div>
+
+      <div class="hero__actions">
+        <label class="search-field" for="searchInput">
+          <span class="search-field__label">Search events</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search by title, description, or date"
+            autocomplete="off"
+          >
+        </label>
+
+        <label class="sort-field" for="sortSelect">
+          <span class="search-field__label">Sort by</span>
+          <select id="sortSelect" aria-label="Sort events">
+            <option value="elapsed-desc">Longest running</option>
+            <option value="elapsed-asc">Most recent</option>
+            <option value="date-asc">Oldest start date</option>
+            <option value="date-desc">Newest start date</option>
+            <option value="title-asc">Title A-Z</option>
+            <option value="title-desc">Title Z-A</option>
+          </select>
+        </label>
+
+        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+          Toggle dark mode
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary-panel" aria-label="Overview">
+        <div class="summary-card">
+          <span class="summary-card__label">Visible events</span>
+          <strong id="eventCount">0</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">Oldest event</span>
+          <strong id="oldestEvent">-</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card__label">Latest event</span>
+          <strong id="newestEvent">-</strong>
+        </div>
+      </section>
+
+      <section>
+        <div id="eventsGrid" class="events-grid" aria-live="polite"></div>
+        <p id="emptyState" class="empty-state" hidden>
+          No events match the current search.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <template id="eventCardTemplate">
+    <article class="event-card">
+      <div class="event-card__header">
+        <p class="event-card__date"></p>
+        <h2 class="event-card__title"></h2>
+      </div>
+      <p class="event-card__description"></p>
+      <dl class="event-card__details">
+        <div>
+          <dt>Start date</dt>
+          <dd class="event-card__start"></dd>
+        </div>
+        <div>
+          <dt>Elapsed time</dt>
+          <dd class="event-card__timer"></dd>
+        </div>
+      </dl>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
