@@ -380,6 +380,9 @@ let selectedEventId = events[0].id;
 let isDetailView = false;
 let spotlightTimeoutId = null;
 let customEvents = [];
+let unsubscribeCustomEvents = null;
+const firebaseAvailable = Boolean(window.firebaseReady && window.firebaseClients);
+const firestoreCollection = "customEvents";
 const flipInstances = {};
 
 function getAllEvents() {
@@ -856,6 +859,33 @@ function initializePreferences() {
   isDetailView = savedDetailView === "true";
 }
 
+function syncCustomEventsToStorage() {
+  setStoredValue(storageKeys.customEvents, JSON.stringify(customEvents));
+}
+
+function subscribeToFirestoreEvents() {
+  if (!firebaseAvailable) {
+    return false;
+  }
+
+  unsubscribeCustomEvents = window.firebaseClients.db
+    .collection(firestoreCollection)
+    .orderBy("createdAt", "desc")
+    .onSnapshot(
+      (snapshot) => {
+        customEvents = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        syncCustomEventsToStorage();
+        renderEvents();
+      },
+      () => {
+        customEvents = loadPersistedCustomEvents();
+        renderEvents();
+      }
+    );
+
+  return true;
+}
+
 searchInput.addEventListener("input", () => {
   setPreference(storageKeys.search, searchInput.value);
   renderEvents();
@@ -887,6 +917,13 @@ initializeLanguage();
 initializeTheme();
 initializePreferences();
 initFlipDisplays();
-renderEvents();
+if (!subscribeToFirestoreEvents()) {
+  renderEvents();
+}
 updateTimers();
 window.setInterval(updateTimers, 1000);
+window.addEventListener("beforeunload", () => {
+  if (unsubscribeCustomEvents) {
+    unsubscribeCustomEvents();
+  }
+});

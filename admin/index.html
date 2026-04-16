@@ -51,17 +51,21 @@
       <div class="mb-4 flex flex-col gap-1">
         <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]">Restricted</p>
         <h1 class="font-serif text-3xl font-semibold tracking-[-0.03em]">Admin access</h1>
-        <p class="text-sm text-muted dark:text-nightmuted">Enter the admin password to manage persistent custom events.</p>
+        <p class="text-sm text-muted dark:text-nightmuted">Sign in with Firebase Authentication to manage persistent custom events.</p>
       </div>
 
       <form id="authForm" class="grid gap-4">
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Email</span>
+          <input id="adminEmail" type="email" required class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5">
+        </label>
         <label class="flex flex-col gap-1.5">
           <span class="font-mono text-xs font-medium uppercase tracking-[0.14em] text-muted dark:text-nightmuted">Password</span>
           <input id="adminPassword" type="password" required class="w-full rounded-xl border border-line bg-white/80 px-3 py-2.5 text-sm outline-none transition focus:border-amberink dark:border-nightline dark:bg-white/5">
         </label>
         <div class="flex flex-wrap items-center gap-3">
           <button class="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-nightpaper" type="submit">
-            Unlock admin
+            Sign in
           </button>
           <p id="authStatus" class="text-sm text-muted dark:text-nightmuted" aria-live="polite"></p>
         </div>
@@ -75,12 +79,17 @@
           <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]">Admin</p>
           <h1 class="font-serif text-2xl font-semibold tracking-[-0.03em]">World Event Timers</h1>
         </div>
-        <a
-          href="../index.html"
-          class="inline-flex min-h-10 items-center rounded-full border border-line bg-white/80 px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5"
-        >
-          Back to site
-        </a>
+        <div class="flex items-center gap-2">
+          <button id="logoutButton" type="button" class="inline-flex min-h-10 items-center rounded-full border border-line bg-white/80 px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5">
+            Sign out
+          </button>
+          <a
+            href="../index.html"
+            class="inline-flex min-h-10 items-center rounded-full border border-line bg-white/80 px-4 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline dark:bg-white/5"
+          >
+            Back to site
+          </a>
+        </div>
       </nav>
     </header>
 
@@ -126,6 +135,10 @@
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+  <script src="../firebase-init.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

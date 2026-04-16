@@ -7,16 +7,17 @@ const customEventsList = document.querySelector("#customEventsList");
 const authPanel = document.querySelector("#authPanel");
 const authForm = document.querySelector("#authForm");
 const authStatus = document.querySelector("#authStatus");
+const adminEmail = document.querySelector("#adminEmail");
 const adminPassword = document.querySelector("#adminPassword");
 const adminShell = document.querySelector("#adminShell");
-
-const ADMIN_PASSWORD = "worldtimers-admin";
+const logoutButton = document.querySelector("#logoutButton");
 const storageKeys = {
   customEvents: "world_event_timers_custom_events",
   selectedEvent: "world_event_timers_selected_event",
   theme: "world_event_timers_theme",
-  adminAuth: "world_event_timers_admin_auth",
 };
+const firestoreCollection = "customEvents";
+const HOME_PAGE = "index.html";
 
 function setCookie(name, value, days = 365) {
   const expires = new Date(Date.now() + days * 86400000).toUTCString();
@@ -68,6 +69,8 @@ function loadCustomEvents() {
 }
 
 let customEvents = loadCustomEvents();
+let unsubscribeCustomEvents = null;
+const firebaseAvailable = Boolean(window.firebaseReady && window.firebaseClients);
 
 function applyThemeFromStorage() {
   const savedTheme = getStoredValue(storageKeys.theme);
@@ -87,6 +90,11 @@ function saveCustomEvents() {
 function unlockAdmin() {
   authPanel.hidden = true;
   adminShell.hidden = false;
+}
+
+function lockAdmin() {
+  authPanel.hidden = false;
+  adminShell.hidden = true;
 }
 
 function renderCustomEvents() {
@@ -122,14 +130,24 @@ function renderCustomEvents() {
     useButton.textContent = "Open";
     useButton.addEventListener("click", () => {
       setStoredValue(storageKeys.selectedEvent, event.id);
-      window.location.href = "index.html";
+      window.location.href = HOME_PAGE;
     });
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
     removeButton.className = "inline-flex min-h-10 items-center rounded-full border border-line px-3 py-2 text-sm font-medium transition hover:border-amberink focus:outline-none focus:border-amberink dark:border-nightline";
     removeButton.textContent = "Delete";
-    removeButton.addEventListener("click", () => {
+    removeButton.addEventListener("click", async () => {
+      if (firebaseAvailable) {
+        try {
+          await window.firebaseClients.db.collection(firestoreCollection).doc(event.id).delete();
+          adminStatus.textContent = "Event deleted.";
+        } catch {
+          adminStatus.textContent = "Could not delete event from Firestore.";
+        }
+        return;
+      }
+
       customEvents = customEvents.filter((item) => item.id !== event.id);
       saveCustomEvents();
       adminStatus.textContent = "Event deleted.";
@@ -154,22 +172,30 @@ function createLocalizedText(text) {
   };
 }
 
-authForm.addEventListener("submit", (event) => {
+authForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (adminPassword.value !== ADMIN_PASSWORD) {
-    authStatus.textContent = "Incorrect password.";
-    adminPassword.select();
+  if (!firebaseAvailable) {
+    authStatus.textContent = "Firebase is not configured yet. Update firebase-init.js.";
     return;
   }
 
-  sessionStorage.setItem(storageKeys.adminAuth, "true");
-  authStatus.textContent = "";
-  adminPassword.value = "";
-  unlockAdmin();
+  authStatus.textContent = "Signing in...";
+
+  try {
+    await window.firebaseClients.auth.signInWithEmailAndPassword(
+      adminEmail.value.trim(),
+      adminPassword.value
+    );
+    authStatus.textContent = "";
+    authForm.reset();
+  } catch {
+    authStatus.textContent = "Sign-in failed. Check your email/password.";
+    adminPassword.select();
+  }
 });
 
-adminForm.addEventListener("submit", (event) => {
+adminForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const title = adminEventTitle.value.trim();
@@ -196,6 +222,22 @@ adminForm.addEventListener("submit", (event) => {
     startDate: isoDate,
   };
 
+  if (firebaseAvailable) {
+    try {
+      await window.firebaseClients.db.collection(firestoreCollection).doc(customEvent.id).set({
+        ...customEvent,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      setStoredValue(storageKeys.selectedEvent, customEvent.id);
+      adminForm.reset();
+      adminStatus.textContent = "Event saved.";
+      return;
+    } catch {
+      adminStatus.textContent = "Could not save event to Firestore.";
+      return;
+    }
+  }
+
   customEvents.unshift(customEvent);
   saveCustomEvents();
   setStoredValue(storageKeys.selectedEvent, customEvent.id);
@@ -207,6 +249,45 @@ adminForm.addEventListener("submit", (event) => {
 renderCustomEvents();
 applyThemeFromStorage();
 
-if (sessionStorage.getItem(storageKeys.adminAuth) === "true") {
+if (firebaseAvailable) {
+  window.firebaseClients.auth.onAuthStateChanged((user) => {
+    if (!user) {
+      if (unsubscribeCustomEvents) {
+        unsubscribeCustomEvents();
+        unsubscribeCustomEvents = null;
+      }
+      customEvents = [];
+      renderCustomEvents();
+      lockAdmin();
+      return;
+    }
+
+    unlockAdmin();
+    unsubscribeCustomEvents = window.firebaseClients.db
+      .collection(firestoreCollection)
+      .orderBy("createdAt", "desc")
+      .onSnapshot(
+        (snapshot) => {
+          customEvents = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          saveCustomEvents();
+          renderCustomEvents();
+        },
+        () => {
+          adminStatus.textContent = "Could not sync Firestore events.";
+        }
+      );
+  });
+} else {
   unlockAdmin();
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener("click", async () => {
+    if (firebaseAvailable) {
+      await window.firebaseClients.auth.signOut();
+      return;
+    }
+
+    lockAdmin();
+  });
 }
