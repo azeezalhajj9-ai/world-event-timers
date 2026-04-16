@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700;800&display=swap"
     rel="stylesheet"
   >
   <link href="vendor/flip/flip.min.css" rel="stylesheet">
@@ -35,8 +35,9 @@
             nightline: "#5a4835"
           },
           fontFamily: {
-            sans: ["Inter", "sans-serif"],
-            serif: ["Newsreader", "serif"]
+            sans: ["Crimson Pro", "serif"],
+            serif: ["Playfair Display", "serif"],
+            mono: ["IBM Plex Mono", "monospace"]
           },
           boxShadow: {
             card: "0 18px 42px rgba(73, 53, 31, 0.08)"
@@ -67,12 +68,12 @@
       <nav class="flex flex-col gap-3 px-3 py-3 sm:px-4 lg:px-5">
         <div class="flex min-h-[56px] flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div class="flex min-w-0 items-center gap-3">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line/80 bg-white/70 text-sm font-semibold text-amberink dark:border-nightline/70 dark:bg-white/5 dark:text-[#d7b183]">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line/80 bg-white/70 font-mono text-sm font-semibold text-amberink dark:border-nightline/70 dark:bg-white/5 dark:text-[#d7b183]">
               WT
             </div>
             <div class="min-w-0">
               <p
-                class="text-[10px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"
+                class="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"
                 data-i18n="eyebrow"
               >
                 Historical timelines in motion
@@ -85,7 +86,7 @@
               </h1>
             </div>
           </div>
-          <div class="hidden shrink-0 rounded-full border border-line/80 bg-white/70 px-3 py-1 text-xs font-medium text-muted dark:border-nightline/70 dark:bg-white/5 dark:text-nightmuted lg:block">
+          <div class="hidden shrink-0 rounded-full border border-line/80 bg-white/70 px-3 py-1 font-mono text-xs font-medium uppercase tracking-[0.12em] text-muted dark:border-nightline/70 dark:bg-white/5 dark:text-nightmuted lg:block">
             Historical event tracker
           </div>
         </div>
@@ -93,7 +94,7 @@
         <div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,160px)_auto] xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,180px)_auto]">
           <label class="flex flex-col gap-1.5">
             <span
-              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
               data-i18n="searchLabel"
             >
               Search events
@@ -108,7 +109,7 @@
 
           <label class="flex flex-col gap-1.5">
             <span
-              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
               data-i18n="sortLabel"
             >
               Sort by
@@ -122,7 +123,7 @@
 
           <label class="flex flex-col gap-1.5">
             <span
-              class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
+              class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]"
               data-i18n="languageLabel"
             >
               Language
@@ -174,7 +175,7 @@
           <div class="flex justify-center">
             <span
               id="focusCategory"
-              class="rounded-full border border-line bg-paper px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"
+              class="rounded-full border border-line bg-paper px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"
             >
               -
             </span>
@@ -188,41 +189,41 @@
 
           <div class="focus-panel__timer-block rounded-[22px] border border-line bg-paper/80 p-5 dark:border-nightline dark:bg-white/5">
             <span
-              class="focus-panel__timer-label text-[11px] font-semibold uppercase tracking-[0.22em] text-amberink dark:text-[#d7b183]"
+              class="focus-panel__timer-label font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-amberink dark:text-[#d7b183]"
               data-i18n="elapsedLabel"
             >
               Elapsed time
             </span>
-            <div class="flip-grid mt-4">
+            <div class="flip-grid mt-4" dir="ltr">
               <div class="flip-unit flex flex-col items-center gap-2">
                 <div id="flipYears" class="tick flip-tick" aria-hidden="true">
                   <div data-repeat="true"><span data-view="flip"></span></div>
                 </div>
-                <span id="flipYearsLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">Y</span>
+                <span id="flipYearsLabel" class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">Y</span>
               </div>
               <div class="flip-unit flex flex-col items-center gap-2">
                 <div id="flipDays" class="tick flip-tick" aria-hidden="true">
                   <div data-repeat="true"><span data-view="flip"></span></div>
                 </div>
-                <span id="flipDaysLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">D</span>
+                <span id="flipDaysLabel" class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">D</span>
               </div>
               <div class="flip-unit flex flex-col items-center gap-2">
                 <div id="flipHours" class="tick flip-tick" aria-hidden="true">
                   <div data-repeat="true"><span data-view="flip"></span></div>
                 </div>
-                <span id="flipHoursLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">H</span>
+                <span id="flipHoursLabel" class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">H</span>
               </div>
               <div class="flip-unit flex flex-col items-center gap-2">
                 <div id="flipMinutes" class="tick flip-tick" aria-hidden="true">
                   <div data-repeat="true"><span data-view="flip"></span></div>
                 </div>
-                <span id="flipMinutesLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">M</span>
+                <span id="flipMinutesLabel" class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">M</span>
               </div>
               <div class="flip-unit flex flex-col items-center gap-2">
                 <div id="flipSeconds" class="tick flip-tick" aria-hidden="true">
                   <div data-repeat="true"><span data-view="flip"></span></div>
                 </div>
-                <span id="flipSecondsLabel" class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">S</span>
+                <span id="flipSecondsLabel" class="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted dark:text-nightmuted">S</span>
               </div>
             </div>
             <strong
@@ -260,19 +261,19 @@
       role="button"
     >
       <div class="event-card__header grid gap-2">
-        <span class="event-card__category inline-flex w-fit rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"></span>
-        <p class="event-card__date text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"></p>
+        <span class="event-card__category inline-flex w-fit rounded-full border border-line bg-paper px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-amberink dark:border-nightline dark:bg-white/5 dark:text-[#d7b183]"></span>
+        <p class="event-card__date font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-amberink dark:text-[#d7b183]"></p>
         <h3 class="event-card__title font-serif text-[1.7rem] font-semibold leading-[1.05] tracking-[-0.03em]"></h3>
       </div>
       <p class="event-card__description text-sm leading-7 text-muted dark:text-nightmuted"></p>
       <dl class="event-card__details mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-[1fr_auto] sm:items-end dark:border-nightline">
         <div>
-          <dt class="event-card__start-label text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Start date</dt>
+          <dt class="event-card__start-label font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Start date</dt>
           <dd class="event-card__start mt-2 text-sm text-muted dark:text-nightmuted"></dd>
         </div>
         <div>
-          <dt class="event-card__timer-label text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Elapsed time</dt>
-          <dd class="event-card__timer mt-2 font-serif text-2xl font-semibold leading-none tracking-[-0.03em] sm:text-right"></dd>
+          <dt class="event-card__timer-label font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-amberink dark:text-[#d7b183]">Elapsed time</dt>
+          <dd class="event-card__timer mt-2 font-mono text-2xl font-semibold leading-none tracking-[-0.03em] sm:text-right"></dd>
         </div>
       </dl>
     </article>

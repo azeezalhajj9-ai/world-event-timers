@@ -2,6 +2,8 @@ body {
   background-image:
     radial-gradient(circle at top right, rgba(207, 185, 144, 0.12), transparent 28%),
     linear-gradient(180deg, #f7f1e7 0%, #f3ebdf 52%, #efe7db 100%);
+  font-family: "Crimson Pro", serif;
+  letter-spacing: 0.01em;
 }
 
 body.dark-theme {
@@ -28,7 +30,7 @@ select {
 select option {
   color: #241c14;
   background-color: #fffaf3;
-  font-family: "Inter", sans-serif;
+  font-family: "Crimson Pro", serif;
 }
 
 .dark select {
@@ -39,7 +41,7 @@ select option {
 .dark select option {
   color: #f4eadc;
   background-color: #1b1611;
-  font-family: "Inter", sans-serif;
+  font-family: "Crimson Pro", serif;
 }
 
 .flip-grid {
@@ -47,20 +49,26 @@ select option {
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   gap: 1rem;
   width: 100%;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 .flip-unit {
   width: 100%;
   min-width: 0;
   overflow: hidden;
+  direction: ltr;
 }
 
 .flip-tick {
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
   font-size: clamp(2.4rem, 5vw, 5.5rem);
   overflow: hidden;
+  font-family: "IBM Plex Mono", monospace;
+  direction: ltr;
 }
 
 .tick [data-repeat="true"] {
@@ -73,6 +81,24 @@ select option {
 .tick-flip {
   min-width: 1.1em;
   flex: 0 0 auto;
+}
+
+.tick-flip,
+.tick-flip-panel,
+.tick-flip-card,
+.tick-flip-panel-text-wrapper {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.event-card__description,
+.event-card__start {
+  font-family: "Crimson Pro", serif;
+}
+
+.focus-panel__title,
+.event-card__title {
+  text-wrap: balance;
 }
 
 @media (max-width: 640px) {
